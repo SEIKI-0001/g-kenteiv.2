@@ -1,18 +1,20 @@
 :root {
   color-scheme: light;
-  --ink: #17202a;
-  --muted: #687583;
-  --line: #dde4ea;
-  --paper: #f6f8f5;
+  --ink: #18232f;
+  --muted: #627181;
+  --line: #dfe6ec;
   --panel: #ffffff;
-  --charcoal: #162624;
-  --teal: #0c8278;
-  --green: #8cc84b;
-  --orange: #f0a33a;
-  --coral: #e85d3f;
-  --blue: #3e74b8;
-  --violet: #7660b5;
-  --shadow: 0 18px 44px rgba(31, 47, 55, 0.12);
+  --paper: #f5f7f4;
+  --teal: #0b746b;
+  --teal-dark: #075a53;
+  --green: #74b843;
+  --amber: #efb044;
+  --coral: #e96f4c;
+  --blue: #376fb4;
+  --violet: #725da8;
+  --charcoal: #152526;
+  --soft-teal: #e7f2ee;
+  --shadow: 0 16px 42px rgba(30, 45, 55, 0.1);
 }
 
 * {
@@ -22,9 +24,7 @@
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    linear-gradient(180deg, rgba(12, 130, 120, 0.08), rgba(246, 248, 245, 0) 360px),
-    var(--paper);
+  background: var(--paper);
   color: var(--ink);
   font-family: "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: 0;
@@ -41,55 +41,54 @@ button {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 268px minmax(0, 1fr);
+  grid-template-columns: 278px minmax(0, 1fr);
   min-height: 100vh;
 }
 
-.side-nav {
+.sidebar {
   position: sticky;
   top: 0;
   display: flex;
   height: 100vh;
   flex-direction: column;
-  gap: 22px;
-  padding: 22px 16px;
+  gap: 24px;
+  padding: 24px 18px;
   background: var(--charcoal);
-  color: #f4fbf7;
+  color: #f4faf8;
 }
 
 .brand {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   min-width: 0;
 }
 
-.brand-icon {
+.brand-mark {
   display: grid;
   width: 44px;
   height: 44px;
   place-items: center;
   border-radius: 8px;
-  background: var(--coral);
-  color: #fff7e8;
-  font-size: 22px;
+  background: #dcefcf;
+  color: var(--charcoal);
+  font-weight: 800;
 }
 
 .brand p,
 .brand span,
-.streak-box p {
+.sidebar-status p {
   margin: 0;
 }
 
 .brand p {
-  font-size: 16px;
   font-weight: 800;
+  line-height: 1.35;
 }
 
 .brand span {
-  color: #b7cbc6;
+  color: #bdd0cc;
   font-size: 12px;
-  font-weight: 700;
 }
 
 .nav-list {
@@ -97,7 +96,7 @@ button {
   gap: 6px;
 }
 
-.nav-link {
+.nav-item {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
@@ -106,26 +105,26 @@ button {
   border-radius: 8px;
   padding: 8px 10px;
   background: transparent;
-  color: #dce9e5;
+  color: #dbe8e3;
   text-align: left;
 }
 
-.nav-link span:first-child {
+.nav-item span:first-child {
   display: grid;
   width: 24px;
   height: 24px;
   place-items: center;
-  color: #f6c45d;
+  color: #bddf82;
   font-weight: 800;
 }
 
-.nav-link:hover,
-.nav-link.is-active {
+.nav-item:hover,
+.nav-item.is-active {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
 
-.streak-box {
+.sidebar-status {
   margin-top: auto;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
@@ -133,16 +132,14 @@ button {
   background: rgba(255, 255, 255, 0.07);
 }
 
-.streak-box strong {
+.sidebar-status strong {
   display: block;
-  margin: 6px 0 8px;
-  color: #ffd66a;
-  font-size: 30px;
-  line-height: 1;
+  margin: 8px 0;
+  font-size: 20px;
 }
 
-.streak-box p {
-  color: #c5d5d1;
+.sidebar-status p {
+  color: #c7d7d3;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -154,13 +151,19 @@ button {
 
 .topbar {
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
   align-items: center;
+  justify-content: space-between;
+  gap: 18px;
   margin-bottom: 22px;
 }
 
-.label {
+.topbar h1 {
+  margin: 4px 0 0;
+  font-size: clamp(24px, 2.3vw, 34px);
+  line-height: 1.2;
+}
+
+.eyebrow {
   color: var(--teal);
   font-size: 11px;
   font-weight: 800;
@@ -168,91 +171,97 @@ button {
   text-transform: uppercase;
 }
 
-.topbar h1 {
-  margin: 4px 0 0;
-  font-size: clamp(24px, 2.4vw, 36px);
-  line-height: 1.18;
-}
-
-.player {
+.topbar-actions,
+.toolbar,
+.card-top,
+.inline-actions,
+.reward-row,
+.filter-row,
+.loop-row {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
-  min-width: min(420px, 100%);
+  align-items: center;
 }
 
-.player-stats {
-  flex: 1 1 auto;
-  min-width: 180px;
+.status-pill {
+  min-width: 118px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 9px 12px;
-  background: var(--panel);
+  padding: 8px 10px;
+  background: #ffffff;
 }
 
-.player-stats span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.xp-track,
-.progress-track {
-  overflow: hidden;
-  height: 9px;
-  border-radius: 999px;
-  background: #e4ebef;
-}
-
-.xp-track {
-  margin-top: 7px;
-}
-
-.xp-track span,
-.progress-track span {
+.status-pill span {
   display: block;
-  height: 100%;
-  border-radius: inherit;
+  color: var(--muted);
+  font-size: 11px;
 }
 
-.xp-track span {
-  background: linear-gradient(90deg, var(--green), var(--orange), var(--coral));
+.status-pill strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 16px;
 }
 
-.coin-btn,
+.icon-button,
 .primary-button,
 .secondary-button,
-.icon-button,
-.quest-action,
-.tab-button {
+.mission-action,
+.segment-button {
   min-height: 38px;
   border-radius: 8px;
 }
 
-.coin-btn,
-.secondary-button,
-.icon-button,
-.quest-action {
+.icon-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
   border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--ink);
-}
-
-.coin-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  background: #ffffff;
+  color: var(--teal);
   font-weight: 800;
 }
 
-.coin-btn span {
-  color: var(--orange);
+.primary-button,
+.secondary-button,
+.mission-action,
+.segment-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  font-weight: 800;
+}
+
+.primary-button {
+  border: 1px solid transparent;
+  background: var(--teal);
+  color: #ffffff;
+}
+
+.primary-button:hover {
+  background: var(--teal-dark);
+}
+
+.secondary-button,
+.mission-action {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.secondary-button:hover,
+.mission-action:hover,
+.icon-button:hover {
+  border-color: #b8c7ce;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr);
+  grid-template-columns: minmax(0, 1.55fr) minmax(310px, 0.85fr);
   gap: 18px;
   align-items: start;
 }
@@ -273,35 +282,41 @@ button {
   padding: 18px;
 }
 
-.hero {
+.loop-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(270px, 0.72fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 20px;
   padding: 22px;
 }
 
-.hero h2,
+.loop-panel h2,
 .section-title h2,
 .view-header h2,
-.metric strong,
-.rank-card strong {
+.stat strong,
+.principle-card h3,
+.mission-card h3,
+.mastery-card h3,
+.review-card h3,
+.reward-card h3,
+.coach-step h3 {
   margin: 0;
 }
 
-.hero h2 {
-  font-size: clamp(26px, 3vw, 44px);
-  line-height: 1.12;
+.loop-panel h2 {
+  max-width: 760px;
+  font-size: clamp(24px, 2.8vw, 42px);
+  line-height: 1.15;
 }
 
-.hero p {
+.loop-panel p {
   max-width: 760px;
   margin: 12px 0 18px;
   color: var(--muted);
   line-height: 1.75;
 }
 
-.hero-map {
-  min-height: 234px;
+.loop-visual {
+  min-height: 230px;
   display: grid;
   align-items: center;
   border: 1px solid var(--line);
@@ -309,26 +324,54 @@ button {
   background: #fbfdfb;
 }
 
-.hero-map img {
+.loop-visual img {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.inline-actions,
-.section-title,
-.card-top,
-.reward-row,
-.badge-row,
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+.progress-grid,
+.principle-grid,
+.mastery-grid,
+.reward-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  min-height: 112px;
+  padding: 16px;
+}
+
+.stat span,
+.small-text,
+.metric-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.stat em {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--teal);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
 }
 
 .section-title {
+  display: flex;
+  align-items: end;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 14px;
 }
 
@@ -337,261 +380,158 @@ button {
 }
 
 .section-title p,
-.view-header p {
+.view-header p,
+.principle-card p,
+.mission-card p,
+.mastery-card p,
+.review-card p,
+.reward-card p,
+.coach-step p {
   margin: 5px 0 0;
   color: var(--muted);
-  line-height: 1.7;
-}
-
-.primary-button,
-.secondary-button,
-.quest-action,
-.tab-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 14px;
-  font-weight: 800;
-}
-
-.primary-button {
-  border: 1px solid transparent;
-  background: var(--coral);
-  color: #ffffff;
-}
-
-.primary-button:hover {
-  background: #cf4d32;
-}
-
-.secondary-button:hover,
-.quest-action:hover {
-  border-color: #b7c6cc;
-}
-
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.metric {
-  min-height: 112px;
-  padding: 16px;
-}
-
-.metric span {
-  color: var(--muted);
   font-size: 12px;
+  line-height: 1.65;
 }
 
-.metric strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 28px;
-  line-height: 1;
-}
-
-.metric em {
-  display: inline-block;
-  margin-top: 11px;
-  color: var(--teal);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 800;
-}
-
-.quest-list,
-.dungeon-list,
-.achievement-list,
-.card-grid,
-.boss-grid,
-.guild-list {
+.mission-list,
+.review-list,
+.coach-list {
   display: grid;
   gap: 10px;
 }
 
-.quest-card {
+.mission-card {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
-  min-height: 76px;
+  min-height: 78px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 12px;
   background: #ffffff;
 }
 
-.quest-card.is-complete {
+.mission-card.is-done {
   background: #f2faef;
 }
 
-.quest-icon,
-.level-node,
-.badge-icon,
-.card-icon {
+.mission-icon,
+.principle-icon,
+.reward-icon,
+.coach-index {
   display: grid;
   place-items: center;
   border-radius: 8px;
   font-weight: 800;
 }
 
-.quest-icon {
+.mission-icon {
   width: 40px;
   height: 40px;
-  background: #fff1dd;
-  color: var(--orange);
-  font-size: 20px;
+  background: var(--soft-teal);
+  color: var(--teal);
 }
 
-.quest-card.is-complete .quest-icon {
-  background: #e7f5dc;
-  color: #4e8e30;
+.mission-card.is-done .mission-icon {
+  background: #e7f4dc;
+  color: #4f8b2f;
 }
 
-.quest-card h3,
-.dungeon-card h3,
-.achievement-item h3,
-.boss-card h3,
-.guild-item h3,
-.card-item h3 {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.quest-card p,
-.dungeon-card p,
-.achievement-item p,
-.boss-card p,
-.guild-item p,
-.card-item p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.65;
-}
-
-.reward-pill {
+.tag {
   display: inline-flex;
   min-height: 28px;
   align-items: center;
-  border: 1px solid #efd9a7;
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px 9px;
-  background: #fff8e7;
-  color: #9a6a1d;
+  background: #ffffff;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 800;
 }
 
-.level-path {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
+.tag.is-warm {
+  border-color: rgba(239, 176, 68, 0.42);
+  background: #fff7e8;
+  color: #9a6b1d;
 }
 
-.level-node {
-  min-height: 92px;
-  border: 1px solid var(--line);
-  background: #ffffff;
-  color: var(--muted);
+.tag.is-alert {
+  border-color: rgba(233, 111, 76, 0.36);
+  background: #fff1ec;
+  color: #b95035;
 }
 
-.level-node.is-current {
-  border-color: rgba(232, 93, 63, 0.4);
-  background: #fff2ee;
-  color: var(--coral);
+.progress-track {
+  overflow: hidden;
+  height: 9px;
+  border-radius: 999px;
+  background: #e6edf1;
 }
 
-.level-node.is-clear {
-  background: #eef8e9;
-  color: #4e8e30;
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--teal);
 }
 
-.dungeon-card,
-.achievement-item,
-.boss-card,
-.guild-item,
-.card-item,
-.rank-card {
+.mastery-card,
+.principle-card,
+.review-card,
+.reward-card,
+.coach-step {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
 }
 
-.dungeon-card {
+.mastery-card,
+.principle-card,
+.reward-card {
   display: grid;
   gap: 12px;
   padding: 14px;
 }
 
-.dungeon-row {
-  display: grid;
-  grid-template-columns: 94px minmax(0, 1fr) 42px;
-  gap: 10px;
-  align-items: center;
-  font-size: 13px;
-}
-
-.progress-track span {
-  background: var(--teal);
-}
-
-.achievement-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 12px;
-  padding: 12px;
-}
-
-.badge-icon,
-.card-icon {
+.principle-icon,
+.reward-icon,
+.coach-index {
   width: 38px;
   height: 38px;
 }
 
-.badge-icon {
-  background: #eef4ff;
+.principle-icon {
+  background: #eef5ff;
   color: var(--blue);
 }
 
-.boss-grid,
-.card-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.boss-card,
-.card-item,
-.guild-item {
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-}
-
-.boss-score {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-}
-
-.boss-score strong {
-  font-size: 38px;
-  line-height: 1;
-}
-
-.danger {
-  color: var(--coral);
-}
-
-.card-icon {
+.reward-icon {
   background: #f3edff;
   color: var(--violet);
 }
 
-.tab-list {
+.review-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+}
+
+.review-time {
+  display: grid;
+  min-width: 70px;
+  min-height: 50px;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff7e8;
+  color: #9a6b1d;
+  font-weight: 800;
+}
+
+.segment {
   display: inline-flex;
   gap: 4px;
   border: 1px solid var(--line);
@@ -600,16 +540,49 @@ button {
   background: #ffffff;
 }
 
-.tab-button {
+.segment-button {
   min-height: 32px;
   border: 0;
   background: transparent;
   color: var(--muted);
 }
 
-.tab-button.is-active {
+.segment-button.is-active {
   background: var(--teal);
   color: #ffffff;
+}
+
+.side-metric {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mini-card {
+  min-height: 92px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.mini-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 24px;
+}
+
+.confidence {
+  display: grid;
+  gap: 12px;
+}
+
+.confidence-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) 38px;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
 }
 
 .view-wide {
@@ -628,18 +601,19 @@ button {
   font-size: 26px;
 }
 
-.rank-card {
+.coach-step {
   display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 12px;
-  padding: 18px;
+  padding: 14px;
 }
 
-.rank-card strong {
-  font-size: 42px;
-  color: var(--coral);
+.coach-index {
+  background: var(--soft-teal);
+  color: var(--teal);
 }
 
-.challenge-dialog {
+.practice-dialog {
   width: min(680px, calc(100vw - 28px));
   border: 0;
   border-radius: 8px;
@@ -647,11 +621,11 @@ button {
   background: transparent;
 }
 
-.challenge-dialog::backdrop {
-  background: rgba(22, 38, 36, 0.6);
+.practice-dialog::backdrop {
+  background: rgba(21, 37, 38, 0.58);
 }
 
-.challenge-panel {
+.practice-panel {
   position: relative;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -664,18 +638,15 @@ button {
   position: absolute;
   top: 12px;
   right: 12px;
-  display: grid;
-  width: 38px;
-  place-items: center;
 }
 
-.challenge-options {
+.answer-list {
   display: grid;
   gap: 10px;
   margin-top: 16px;
 }
 
-.challenge-option {
+.answer-button {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
   gap: 10px;
@@ -685,17 +656,8 @@ button {
   border-radius: 8px;
   padding: 10px;
   background: #ffffff;
+  color: var(--ink);
   text-align: left;
-}
-
-.challenge-option.is-correct {
-  border-color: #9bcf75;
-  background: #f2faed;
-}
-
-.challenge-option.is-wrong {
-  border-color: #ef9d89;
-  background: #fff1ed;
 }
 
 .answer-key {
@@ -704,16 +666,26 @@ button {
   height: 30px;
   place-items: center;
   border-radius: 8px;
-  background: #eef3f4;
-  color: var(--muted);
+  background: #edf3f2;
+  color: var(--teal);
   font-weight: 800;
 }
 
-.loot-box {
+.answer-button.is-correct {
+  border-color: #91c969;
+  background: #f2faed;
+}
+
+.answer-button.is-wrong {
+  border-color: #ef9d87;
+  background: #fff1ed;
+}
+
+.feedback {
   margin-top: 14px;
-  border-left: 4px solid var(--orange);
+  border-left: 4px solid var(--teal);
   padding: 12px;
-  background: #fff8e9;
+  background: #f3faf7;
   line-height: 1.7;
 }
 
@@ -722,29 +694,30 @@ button {
     grid-template-columns: 86px minmax(0, 1fr);
   }
 
-  .side-nav {
+  .sidebar {
     padding: 18px 12px;
   }
 
   .brand div:last-child,
-  .nav-link span:last-child,
-  .streak-box {
+  .nav-item span:last-child,
+  .sidebar-status {
     display: none;
   }
 
-  .nav-link {
+  .nav-item {
     grid-template-columns: 1fr;
     justify-items: center;
   }
 
   .content-grid,
-  .hero {
+  .loop-panel {
     grid-template-columns: 1fr;
   }
 
-  .metric-grid,
-  .boss-grid,
-  .card-grid {
+  .progress-grid,
+  .principle-grid,
+  .mastery-grid,
+  .reward-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -754,14 +727,14 @@ button {
     display: block;
   }
 
-  .side-nav {
+  .sidebar {
     position: static;
     height: auto;
     padding: 14px;
   }
 
   .brand div:last-child,
-  .nav-link span:last-child {
+  .nav-item span:last-child {
     display: block;
   }
 
@@ -771,7 +744,7 @@ button {
     padding-bottom: 4px;
   }
 
-  .nav-link {
+  .nav-item {
     grid-template-columns: 24px max-content;
     min-width: max-content;
   }
@@ -786,29 +759,32 @@ button {
     flex-direction: column;
   }
 
-  .player {
+  .topbar-actions {
     width: 100%;
-    flex-wrap: wrap;
   }
 
-  .player-stats {
-    flex-basis: 100%;
+  .status-pill {
+    flex: 1 1 130px;
   }
 
-  .metric-grid,
-  .level-path,
-  .boss-grid,
-  .card-grid {
+  .progress-grid,
+  .principle-grid,
+  .mastery-grid,
+  .reward-grid,
+  .side-metric {
     grid-template-columns: 1fr;
   }
 
-  .quest-card,
-  .dungeon-row {
+  .mission-card,
+  .review-card,
+  .confidence-row,
+  .coach-step {
     grid-template-columns: 1fr;
   }
 
-  .quest-icon,
-  .quest-action {
+  .mission-icon,
+  .mission-action,
+  .review-time {
     width: 100%;
   }
 }

@@ -1,206 +1,218 @@
 const state = {
-  activeView: "home",
-  completedQuests: new Set(["q0", "q2"]),
-  activeDungeon: "weak",
+  activeView: "dashboard",
+  activeMode: "recall",
+  completedMissions: new Set(["m1"]),
+  focusDomain: "法律・倫理",
   answered: false,
 };
 
-const quests = [
+const missions = [
   {
-    id: "q0",
-    icon: "✓",
-    title: "法律・倫理のデイリー探索",
-    detail: "AI事業者ガイドライン、個人情報、著作権を15分で確認",
-    xp: 180,
-    coins: 60,
+    id: "m1",
+    type: "recall",
+    icon: "R",
+    title: "法律・倫理を検索練習で確認",
+    detail: "AI事業者ガイドライン、個人情報、著作権を何も見ずに3分説明",
+    reward: "Confidence +8",
+    minutes: 8,
   },
   {
-    id: "q1",
-    icon: "⚔",
-    title: "評価指標のコンボ演習",
-    detail: "適合率、再現率、F値の選び分けを10問",
-    xp: 260,
-    coins: 90,
+    id: "m2",
+    type: "practice",
+    icon: "P",
+    title: "評価指標の選択問題を10問",
+    detail: "適合率、再現率、F値の使い分けを即時フィードバック付きで演習",
+    reward: "Mastery +6",
+    minutes: 12,
   },
   {
-    id: "q2",
-    icon: "◇",
-    title: "Transformerカードを強化",
-    detail: "Attention、事前学習、ファインチューニングをカード復習",
-    xp: 140,
-    coins: 40,
+    id: "m3",
+    type: "explain",
+    icon: "E",
+    title: "Transformerを30秒で説明",
+    detail: "Attention、事前学習、ファインチューニングを自分の言葉で要約",
+    reward: "Explain badge",
+    minutes: 5,
   },
   {
-    id: "q3",
-    icon: "◆",
-    title: "ミニボス模試 25問",
-    detail: "20分以内に正答率72%以上を狙う",
-    xp: 420,
-    coins: 160,
+    id: "m4",
+    type: "review",
+    icon: "S",
+    title: "3日前の誤答だけを再提示",
+    detail: "忘却曲線に合わせて、曖昧なカードを短く再テスト",
+    reward: "Retention +7",
+    minutes: 7,
   },
 ];
 
-const dungeons = {
-  weak: [
-    ["法律・倫理", 42, "ケース判断の取り違え"],
-    ["機械学習", 56, "評価指標と過学習"],
-    ["深層学習", 63, "モデル構造の整理"],
-  ],
-  streak: [
-    ["用語スピード", 74, "朝7分で回収"],
-    ["年表記憶", 68, "AIブームの変遷"],
-    ["生成AI更新", 51, "LLMとRAGの整理"],
-  ],
-  boss: [
-    ["横断50問", 69, "時間配分"],
-    ["本番100問", 61, "長時間集中"],
-    ["直前リカバリー", 77, "誤答だけ再戦"],
-  ],
-};
-
-const achievements = [
-  ["炎", "14日連続学習", "明日も達成でレアバッジへ進化"],
-  ["盾", "法律・倫理を3日連続復習", "ケース問題の正答率 +8pt"],
-  ["鍵", "弱点ダンジョンを2階層突破", "ボス模試の制限時間を解放"],
+const domains = [
+  ["AI基礎", 82, "安定", "#0b746b"],
+  ["機械学習", 57, "評価指標を補強", "#e96f4c"],
+  ["深層学習", 64, "構造説明を練習", "#efb044"],
+  ["法律・倫理", 48, "最優先", "#376fb4"],
+  ["社会実装", 72, "事例を追加", "#725da8"],
+  ["データ活用", 66, "前処理を復習", "#74b843"],
 ];
 
-const cards = [
-  ["SSR", "Attention", "文脈の重要部分へ重みを置く仕組み"],
-  ["SR", "F値", "適合率と再現率の調和平均"],
-  ["R", "MLOps", "モデル運用を継続的に改善する枠組み"],
-  ["SR", "XAI", "AIの判断根拠を説明しやすくする考え方"],
-  ["R", "過学習", "未知データへの汎化性能が下がる状態"],
-  ["SSR", "AIガバナンス", "透明性、公平性、安全性を保つ管理体制"],
+const reviews = [
+  ["今日", "AIガバナンス", "ケース判断を1問"],
+  ["明日", "F値", "誤答した選択肢を比較"],
+  ["3日後", "Transformer", "説明カードを再チェック"],
+  ["7日後", "過学習", "実例で判断"],
+];
+
+const principles = [
+  ["近接目標", "大きな合格目標を、今日終えられる学習契約へ分解。"],
+  ["即時フィードバック", "正誤だけでなく、なぜ間違えたかをその場で返す。"],
+  ["有意味報酬", "単なるポイントよりも、単元理解と再現力に結び付くバッジを付与。"],
+  ["復習間隔", "忘れ始めるタイミングで再提示し、短時間で定着を守る。"],
+];
+
+const rewards = [
+  ["説明者", "深層学習を自分の言葉で説明できた証跡"],
+  ["再現率ガード", "評価指標の使い分けを3回連続で正答"],
+  ["倫理ケース耐性", "法律・倫理のケース問題で失点を減らした証跡"],
+  ["リカバリー", "休息後24時間以内に学習へ戻った証跡"],
 ];
 
 const challenges = [
   {
-    question: "見逃しを最小化したい検査モデルで最も重視されやすい指標はどれですか。",
-    options: ["再現率", "適合率", "訓練データの正解率", "クラスタ数"],
-    answer: 0,
-    loot: "正解で +180XP。再現率は実際の陽性をどれだけ拾えたかを示すため、見逃しの損失が大きい場面で重視されます。",
+    question: "学習サービスのゲーミフィケーションで、最も避けたい設計はどれですか。",
+    options: [
+      "学習行動と報酬の意味を結び付ける",
+      "復習タイミングを短いキューにする",
+      "ログインだけで大量の報酬を与え、理解とは無関係にする",
+      "小さな達成を進捗として可視化する",
+    ],
+    answer: 2,
+    feedback:
+      "報酬が学習成果と切り離されると、行動は増えても理解が進みにくくなります。このモックでは、報酬を再現力、説明力、復習完了に結び付けています。",
   },
   {
-    question: "G検定の直前期に法律・倫理を毎日少しずつ回す狙いはどれですか。",
-    options: ["数式暗記を増やす", "ケース判断と直近論点の失点を減らす", "実装問題に備える", "画像処理だけを固める"],
+    question: "G検定対策で検索練習が有効な理由はどれですか。",
+    options: [
+      "資料を眺める時間だけを増やせるから",
+      "何も見ずに思い出すことで、試験時に使える記憶を鍛えられるから",
+      "問題演習を完全に省略できるから",
+      "直近トピックを無視できるから",
+    ],
     answer: 1,
-    loot: "正解で +160XP。法律・倫理は暗記だけでなく、状況を読んで判断する問題の落とし穴が出やすい領域です。",
+    feedback:
+      "検索練習は思い出す負荷をかける学習です。G検定のように範囲が広い試験では、眺める復習だけでなく、短い再現テストを混ぜる設計が効きます。",
   },
 ];
 
 const app = document.querySelector("#app");
 const pageTitle = document.querySelector("#page-title");
-const dialog = document.querySelector("#challenge-dialog");
-const challengeContent = document.querySelector("#challenge-content");
+const dialog = document.querySelector("#practice-dialog");
+const practiceContent = document.querySelector("#practice-content");
 
-function completionRate() {
-  return Math.round((state.completedQuests.size / quests.length) * 100);
+function completedRate() {
+  return Math.round((state.completedMissions.size / missions.length) * 100);
 }
 
-function totalXp() {
-  return [...state.completedQuests].reduce((sum, id) => {
-    const quest = quests.find((item) => item.id === id);
-    return sum + (quest?.xp ?? 0);
-  }, 8420);
+function todayMinutes() {
+  return [...state.completedMissions].reduce((total, id) => {
+    const mission = missions.find((item) => item.id === id);
+    return total + (mission?.minutes ?? 0);
+  }, 0);
 }
 
 function render() {
-  document.querySelectorAll(".nav-link").forEach((button) => {
+  document.querySelectorAll(".nav-item").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.view === state.activeView);
   });
 
   const titles = {
-    home: "今日の合格クエスト",
-    quests: "デイリークエスト",
-    dungeon: "弱点ダンジョン",
-    boss: "ボス模試",
-    cards: "カード図鑑",
-    guild: "ギルド",
+    dashboard: "今日の学習ループ",
+    missions: "ミッション設計",
+    review: "復習キュー",
+    mastery: "マスタリーマップ",
+    rewards: "リワード設計",
+    coach: "コーチング",
   };
   pageTitle.textContent = titles[state.activeView];
 
   const views = {
-    home: renderHome,
-    quests: renderQuests,
-    dungeon: renderDungeon,
-    boss: renderBoss,
-    cards: renderCards,
-    guild: renderGuild,
+    dashboard: renderDashboard,
+    missions: renderMissions,
+    review: renderReview,
+    mastery: renderMastery,
+    rewards: renderRewards,
+    coach: renderCoach,
   };
-
   app.innerHTML = views[state.activeView]();
   bindEvents();
 }
 
-function renderHome() {
-  const rate = completionRate();
+function renderDashboard() {
+  const done = state.completedMissions.size;
+  const rate = completedRate();
   return `
     <section class="stack">
-      <article class="panel hero">
+      <article class="panel loop-panel">
         <div>
-          <span class="label">Main Campaign</span>
-          <h2>合格までの道のりを、毎日のクエストにする。</h2>
+          <span class="eyebrow">Behavior Loop</span>
+          <h2>学習が続く仕組みを、報酬ではなく上達感から設計する。</h2>
           <p>
-            G検定の広いシラバスを、XP、バッジ、ダンジョン、ボス模試で進める学習体験に変換。
-            今日は弱点を倒して、週末のボス模試へ進みます。
+            参考軸は学習サービスのゲーミフィケーションだけに限定。G検定の学習を、近接目標、即時フィードバック、
+            復習間隔、意味あるバッジで回します。
           </p>
           <div class="inline-actions">
-            <button class="primary-button" data-open-challenge>チャレンジ開始</button>
-            <button class="secondary-button" data-jump="dungeon">弱点ダンジョンへ</button>
+            <button class="primary-button" data-open-practice>クイック診断</button>
+            <button class="secondary-button" data-jump="missions">今日のミッションへ</button>
           </div>
         </div>
-        <figure class="hero-map" aria-label="合格クエストマップ">
-          <img src="./assets/quest-map.svg" alt="G検定合格までのクエストマップ" />
+        <figure class="loop-visual" aria-label="学習ゲーミフィケーションのループ">
+          <img src="./assets/learning-loop.svg" alt="目標、行動、フィードバック、復習の学習ループ" />
         </figure>
       </article>
 
-      <section class="metric-grid" aria-label="プレイヤーステータス">
-        <article class="panel metric">
-          <span>今日のクエスト</span>
-          <strong>${state.completedQuests.size}/${quests.length}</strong>
-          <em>${rate}% clear</em>
+      <section class="progress-grid" aria-label="今日の進捗">
+        <article class="panel stat">
+          <span>ミッション完了</span>
+          <strong>${done}/${missions.length}</strong>
+          <em>${rate}% complete</em>
         </article>
-        <article class="panel metric">
-          <span>総XP</span>
-          <strong>${totalXp().toLocaleString()}</strong>
-          <em>Lv.18</em>
+        <article class="panel stat">
+          <span>集中時間</span>
+          <strong>${todayMinutes()}分</strong>
+          <em>目標 28分</em>
         </article>
-        <article class="panel metric">
-          <span>合格予測</span>
-          <strong>72%</strong>
-          <em>+5pt</em>
+        <article class="panel stat">
+          <span>自信スコア</span>
+          <strong>68</strong>
+          <em>法律・倫理 +4</em>
         </article>
-        <article class="panel metric">
-          <span>次のボス</span>
-          <strong>6/29</strong>
-          <em>50問</em>
+        <article class="panel stat">
+          <span>次の復習</span>
+          <strong>今日</strong>
+          <em>3カード</em>
         </article>
       </section>
 
       <section class="panel panel-pad">
         <div class="section-title">
           <div>
-            <h2>デイリークエスト</h2>
-            <p>完了するとXPとコインを獲得</p>
+            <h2>今日のミッション</h2>
+            <p>報酬は学習成果にひも付ける</p>
           </div>
-          <span class="reward-pill">${rate}% CLEAR</span>
+          <span class="tag is-warm">${rate}%</span>
         </div>
-        <div class="quest-list">
-          ${quests.map(renderQuest).join("")}
+        <div class="mission-list">
+          ${missions.map(renderMission).join("")}
         </div>
       </section>
 
       <section class="panel panel-pad">
         <div class="section-title">
           <div>
-            <h2>合格ロード</h2>
-            <p>ステージを突破して出題範囲を横断</p>
+            <h2>設計レンズ</h2>
+            <p>学習サービスのゲーミフィケーションに限定した参考軸</p>
           </div>
         </div>
-        <div class="level-path">
-          ${["AI基礎", "機械学習", "深層学習", "法律倫理", "ボス模試"]
-            .map((stage, index) => `<div class="level-node ${index < 2 ? "is-clear" : index === 2 ? "is-current" : ""}">${stage}</div>`)
-            .join("")}
+        <div class="principle-grid">
+          ${principles.map(renderPrinciple).join("")}
         </div>
       </section>
     </section>
@@ -209,52 +221,64 @@ function renderHome() {
       <section class="panel panel-pad">
         <div class="section-title">
           <div>
-            <h2>弱点ダンジョン</h2>
-            <p>低スコア領域を優先攻略</p>
+            <h2>マスタリー</h2>
+            <p>弱点を次の行動に変換</p>
           </div>
         </div>
-        <div class="dungeon-list">
-          ${dungeons.weak.map(renderDungeonRow).join("")}
+        <div class="confidence">
+          ${domains.slice(0, 5).map(renderConfidence).join("")}
         </div>
       </section>
 
       <section class="panel panel-pad">
         <div class="section-title">
           <div>
-            <h2>実績バッジ</h2>
-            <p>学習継続で解放</p>
+            <h2>復習キュー</h2>
+            <p>忘れる前に短く戻す</p>
           </div>
         </div>
-        <div class="achievement-list">
-          ${achievements.map(renderAchievement).join("")}
+        <div class="review-list">
+          ${reviews.slice(0, 3).map(renderReviewCard).join("")}
         </div>
       </section>
     </aside>
   `;
 }
 
-function renderQuest(quest) {
-  const complete = state.completedQuests.has(quest.id);
+function renderMission(mission) {
+  const done = state.completedMissions.has(mission.id);
   return `
-    <article class="quest-card ${complete ? "is-complete" : ""}">
-      <div class="quest-icon" aria-hidden="true">${complete ? "✓" : quest.icon}</div>
+    <article class="mission-card ${done ? "is-done" : ""}">
+      <div class="mission-icon" aria-hidden="true">${done ? "✓" : mission.icon}</div>
       <div>
-        <h3>${quest.title}</h3>
-        <p>${quest.detail}</p>
+        <h3>${mission.title}</h3>
+        <p>${mission.detail}</p>
         <div class="reward-row">
-          <span class="reward-pill">+${quest.xp} XP</span>
-          <span class="reward-pill">+${quest.coins} coin</span>
+          <span class="tag">${mission.minutes}分</span>
+          <span class="tag is-warm">${mission.reward}</span>
         </div>
       </div>
-      <button class="quest-action" data-quest="${quest.id}">${complete ? "戻す" : "達成"}</button>
+      <button class="mission-action" data-mission="${mission.id}">${done ? "戻す" : "完了"}</button>
     </article>
   `;
 }
 
-function renderDungeonRow(item) {
-  const color = item[1] < 50 ? "var(--coral)" : item[1] < 65 ? "var(--orange)" : "var(--teal)";
+function renderPrinciple(item, index) {
   return `
-    <div class="dungeon-row">
+    <article class="principle-card">
+      <div class="principle-icon" aria-hidden="true">${index + 1}</div>
+      <div>
+        <h3>${item[0]}</h3>
+        <p>${item[1]}</p>
+      </div>
+    </article>
+  `;
+}
+
+function renderConfidence(item) {
+  const color = item[3];
+  return `
+    <div class="confidence-row">
       <strong>${item[0]}</strong>
       <div class="progress-track" aria-label="${item[0]} ${item[1]}%">
         <span style="width:${item[1]}%; background:${color}"></span>
@@ -264,50 +288,74 @@ function renderDungeonRow(item) {
   `;
 }
 
-function renderAchievement(item) {
+function renderReviewCard(item) {
   return `
-    <article class="achievement-item">
-      <div class="badge-icon" aria-hidden="true">${item[0]}</div>
+    <article class="review-card">
       <div>
         <h3>${item[1]}</h3>
         <p>${item[2]}</p>
       </div>
+      <div class="review-time">${item[0]}</div>
     </article>
   `;
 }
 
-function renderQuests() {
+function renderMissions() {
+  const visible = missions.filter((mission) => state.activeMode === "all" || mission.type === state.activeMode);
   return `
     <section class="panel panel-pad view-wide">
-      ${viewHeader("デイリークエスト", "短時間の学習を、毎日達成できるミッション単位に分解します。")}
-      <div class="quest-list">
-        ${quests.map(renderQuest).join("")}
+      ${viewHeader("ミッション設計", "選べる行動を残しながら、今日やる量は小さく固定します。")}
+      <div class="segment" aria-label="ミッション種別">
+        ${[
+          ["recall", "検索練習"],
+          ["practice", "演習"],
+          ["explain", "説明"],
+          ["review", "復習"],
+          ["all", "すべて"],
+        ]
+          .map(
+            ([mode, label]) => `
+              <button class="segment-button ${state.activeMode === mode ? "is-active" : ""}" data-mode="${mode}">${label}</button>
+            `,
+          )
+          .join("")}
+      </div>
+      <div class="mission-list" style="margin-top: 14px">
+        ${visible.map(renderMission).join("")}
       </div>
     </section>
   `;
 }
 
-function renderDungeon() {
+function renderReview() {
   return `
     <section class="panel panel-pad view-wide">
-      ${viewHeader("弱点ダンジョン", "苦手単元を階層化し、低スコア領域から順番に攻略します。")}
-      <div class="tab-list" aria-label="ダンジョン切り替え">
-        <button class="tab-button ${state.activeDungeon === "weak" ? "is-active" : ""}" data-dungeon="weak">弱点</button>
-        <button class="tab-button ${state.activeDungeon === "streak" ? "is-active" : ""}" data-dungeon="streak">継続</button>
-        <button class="tab-button ${state.activeDungeon === "boss" ? "is-active" : ""}" data-dungeon="boss">模試</button>
+      ${viewHeader("復習キュー", "ポイントは量ではなく、忘れ始めるタイミングに短く戻すこと。")}
+      <div class="review-list">
+        ${reviews.map(renderReviewCard).join("")}
       </div>
-      <div class="dungeon-list" style="margin-top: 14px">
-        ${dungeons[state.activeDungeon]
+    </section>
+  `;
+}
+
+function renderMastery() {
+  return `
+    <section class="panel panel-pad view-wide">
+      ${viewHeader("マスタリーマップ", "スコアは順位ではなく、次の学習行動を決めるための信号として扱います。")}
+      <div class="mastery-grid">
+        ${domains
           .map(
-            (item) => `
-              <article class="dungeon-card">
+            (domain) => `
+              <article class="mastery-card">
                 <div class="card-top">
-                  <h3>${item[0]}</h3>
-                  <span class="reward-pill">${item[1]}%</span>
+                  <h3>${domain[0]}</h3>
+                  <span class="tag ${domain[1] < 55 ? "is-alert" : ""}">${domain[1]}</span>
                 </div>
-                <p>${item[2]}</p>
-                ${renderDungeonRow(item)}
-                <button class="primary-button" data-open-challenge>挑戦する</button>
+                <p>${domain[2]}</p>
+                <div class="progress-track">
+                  <span style="width:${domain[1]}%; background:${domain[3]}"></span>
+                </div>
+                <button class="secondary-button" data-focus="${domain[0]}">集中領域にする</button>
               </article>
             `,
           )
@@ -317,74 +365,47 @@ function renderDungeon() {
   `;
 }
 
-function renderBoss() {
-  const bosses = [
-    ["ミニボス", "25問 / 20分", 68, "評価指標で被弾"],
-    ["中ボス", "50問 / 45分", 72, "法律・倫理を再戦"],
-    ["ラスボス", "100問 / 120分", 61, "集中ゲージ不足"],
+function renderRewards() {
+  return `
+    <section class="panel panel-pad view-wide">
+      ${viewHeader("リワード設計", "報酬は飾りではなく、身についた行動や理解の証跡として扱います。")}
+      <div class="reward-grid">
+        ${rewards
+          .map(
+            (reward, index) => `
+              <article class="reward-card">
+                <div class="reward-icon" aria-hidden="true">${index + 1}</div>
+                <h3>${reward[0]}</h3>
+                <p>${reward[1]}</p>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderCoach() {
+  const steps = [
+    ["今日の上限を決める", "28分以上に増やさず、完了体験を守る。"],
+    ["最初に検索練習", "資料を見る前に思い出すことで、理解の穴を見つける。"],
+    ["誤答を復習日へ送る", "間違えた直後だけで終わらせず、1日後と3日後に戻す。"],
+    ["休息後の復帰を評価", "連続記録だけでなく、戻ってきた行動もリワード化する。"],
   ];
   return `
     <section class="panel panel-pad view-wide">
-      ${viewHeader("ボス模試", "本番形式の模試をボス戦として扱い、敗因を次のクエストへ戻します。")}
-      <div class="boss-grid">
-        ${bosses
+      ${viewHeader("コーチング", `現在の集中領域は「${state.focusDomain}」。学習量より、戻れるリズムを優先します。`)}
+      <div class="coach-list">
+        ${steps
           .map(
-            (boss) => `
-              <article class="boss-card">
-                <span class="label">${boss[1]}</span>
-                <h3>${boss[0]}</h3>
-                <div class="boss-score"><strong>${boss[2]}</strong><span>%</span></div>
-                <p>${boss[3]}</p>
-                <button class="secondary-button" data-open-challenge>再戦準備</button>
-              </article>
-            `,
-          )
-          .join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderCards() {
-  return `
-    <section class="panel panel-pad view-wide">
-      ${viewHeader("カード図鑑", "頻出用語をカード化し、正答や復習で強化します。")}
-      <div class="card-grid">
-        ${cards
-          .map(
-            (card) => `
-              <article class="card-item">
-                <div class="card-icon" aria-hidden="true">${card[0]}</div>
-                <h3>${card[1]}</h3>
-                <p>${card[2]}</p>
-              </article>
-            `,
-          )
-          .join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderGuild() {
-  const members = [
-    ["あなた", "Lv.18", "今週 +1,240XP"],
-    ["AI基礎班", "Rank A", "平均正答率 78%"],
-    ["法律倫理班", "Rank C", "今日の重点領域"],
-  ];
-  return `
-    <section class="panel panel-pad view-wide">
-      ${viewHeader("ギルド", "学習チームや比較表示のモック。個人学習でも進捗の手応えを出します。")}
-      <div class="guild-list">
-        ${members
-          .map(
-            (member) => `
-              <article class="guild-item">
-                <div class="card-top">
-                  <h3>${member[0]}</h3>
-                  <span class="reward-pill">${member[1]}</span>
+            (step, index) => `
+              <article class="coach-step">
+                <div class="coach-index">${index + 1}</div>
+                <div>
+                  <h3>${step[0]}</h3>
+                  <p>${step[1]}</p>
                 </div>
-                <p>${member[2]}</p>
               </article>
             `,
           )
@@ -398,23 +419,23 @@ function viewHeader(title, copy) {
   return `
     <div class="view-header">
       <div>
-        <span class="label">Gamified Learning</span>
+        <span class="eyebrow">Learning Service Gamification</span>
         <h2>${title}</h2>
         <p>${copy}</p>
       </div>
-      <button class="secondary-button" data-jump="home">ホーム</button>
+      <button class="secondary-button" data-jump="dashboard">戻る</button>
     </div>
   `;
 }
 
 function bindEvents() {
-  document.querySelectorAll("[data-quest]").forEach((button) => {
+  document.querySelectorAll("[data-mission]").forEach((button) => {
     button.addEventListener("click", () => {
-      const id = button.dataset.quest;
-      if (state.completedQuests.has(id)) {
-        state.completedQuests.delete(id);
+      const id = button.dataset.mission;
+      if (state.completedMissions.has(id)) {
+        state.completedMissions.delete(id);
       } else {
-        state.completedQuests.add(id);
+        state.completedMissions.add(id);
       }
       render();
     });
@@ -427,29 +448,37 @@ function bindEvents() {
     });
   });
 
-  document.querySelectorAll("[data-dungeon]").forEach((button) => {
+  document.querySelectorAll("[data-mode]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.activeDungeon = button.dataset.dungeon;
+      state.activeMode = button.dataset.mode;
       render();
     });
   });
 
-  document.querySelectorAll("[data-open-challenge]").forEach((button, index) => {
-    button.addEventListener("click", () => openChallenge(index % challenges.length));
+  document.querySelectorAll("[data-focus]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.focusDomain = button.dataset.focus;
+      state.activeView = "coach";
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-open-practice]").forEach((button, index) => {
+    button.addEventListener("click", () => openPractice(index % challenges.length));
   });
 }
 
-function openChallenge(index) {
+function openPractice(index = 0) {
   state.answered = false;
   const challenge = challenges[index];
-  challengeContent.innerHTML = `
-    <span class="label">Battle Question</span>
+  practiceContent.innerHTML = `
+    <span class="eyebrow">Quick Feedback</span>
     <h2 style="margin: 6px 44px 0 0; line-height: 1.45">${challenge.question}</h2>
-    <div class="challenge-options">
+    <div class="answer-list">
       ${challenge.options
         .map(
           (option, optionIndex) => `
-            <button class="challenge-option" type="button" data-answer="${optionIndex}">
+            <button class="answer-button" type="button" data-answer="${optionIndex}">
               <span class="answer-key">${String.fromCharCode(65 + optionIndex)}</span>
               <span>${option}</span>
             </button>
@@ -457,31 +486,33 @@ function openChallenge(index) {
         )
         .join("")}
     </div>
-    <div id="loot-slot"></div>
+    <div id="feedback-slot"></div>
   `;
 
-  challengeContent.querySelectorAll("[data-answer]").forEach((button) => {
+  practiceContent.querySelectorAll("[data-answer]").forEach((button) => {
     button.addEventListener("click", () => {
       if (state.answered) return;
       state.answered = true;
       const answer = Number(button.dataset.answer);
-      challengeContent.querySelectorAll("[data-answer]").forEach((option) => {
+      practiceContent.querySelectorAll("[data-answer]").forEach((option) => {
         const optionAnswer = Number(option.dataset.answer);
         option.classList.toggle("is-correct", optionAnswer === challenge.answer);
         option.classList.toggle("is-wrong", optionAnswer === answer && answer !== challenge.answer);
       });
-      document.querySelector("#loot-slot").innerHTML = `<div class="loot-box">${challenge.loot}</div>`;
+      document.querySelector("#feedback-slot").innerHTML = `<div class="feedback">${challenge.feedback}</div>`;
     });
   });
 
   dialog.showModal();
 }
 
-document.querySelectorAll(".nav-link").forEach((button) => {
+document.querySelectorAll(".nav-item").forEach((button) => {
   button.addEventListener("click", () => {
     state.activeView = button.dataset.view;
     render();
   });
 });
+
+document.querySelector("#open-challenge").addEventListener("click", () => openPractice(1));
 
 render();

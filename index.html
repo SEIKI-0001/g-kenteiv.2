@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>G検定クエスト | ゲーミフィケーション版</title>
+    <title>G検定マスタリーラボ | Gamified Learning Service</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23e85d3f'/%3E%3Cpath d='M32 10l6.5 13.3 14.7 2.1-10.6 10.3 2.5 14.6L32 43.4 18.9 50.3l2.5-14.6L10.8 25.4l14.7-2.1L32 10z' fill='white'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b746b'/%3E%3Cpath d='M18 35l9 9 19-24' stroke='white' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,66 +18,65 @@
   </head>
   <body>
     <div class="app-shell">
-      <aside class="side-nav" aria-label="メインナビゲーション">
+      <aside class="sidebar" aria-label="メインナビゲーション">
         <div class="brand">
-          <div class="brand-icon" aria-hidden="true">★</div>
+          <div class="brand-mark" aria-hidden="true">M</div>
           <div>
-            <p>G検定クエスト</p>
-            <span>Rank B / Lv. 18</span>
+            <p>G検定マスタリーラボ</p>
+            <span>学習ゲーミフィケーション版</span>
           </div>
         </div>
 
         <nav class="nav-list">
-          <button class="nav-link is-active" data-view="home">
+          <button class="nav-item is-active" data-view="dashboard">
             <span aria-hidden="true">⌂</span>
-            <span>ホーム</span>
+            <span>ダッシュボード</span>
           </button>
-          <button class="nav-link" data-view="quests">
-            <span aria-hidden="true">⚑</span>
-            <span>クエスト</span>
+          <button class="nav-item" data-view="missions">
+            <span aria-hidden="true">✓</span>
+            <span>ミッション</span>
           </button>
-          <button class="nav-link" data-view="dungeon">
+          <button class="nav-item" data-view="review">
+            <span aria-hidden="true">↻</span>
+            <span>復習キュー</span>
+          </button>
+          <button class="nav-item" data-view="mastery">
+            <span aria-hidden="true">▦</span>
+            <span>マスタリー</span>
+          </button>
+          <button class="nav-item" data-view="rewards">
             <span aria-hidden="true">◇</span>
-            <span>弱点ダンジョン</span>
+            <span>リワード</span>
           </button>
-          <button class="nav-link" data-view="boss">
-            <span aria-hidden="true">◆</span>
-            <span>ボス模試</span>
-          </button>
-          <button class="nav-link" data-view="cards">
-            <span aria-hidden="true">▣</span>
-            <span>カード図鑑</span>
-          </button>
-          <button class="nav-link" data-view="guild">
-            <span aria-hidden="true">♢</span>
-            <span>ギルド</span>
+          <button class="nav-item" data-view="coach">
+            <span aria-hidden="true">✦</span>
+            <span>コーチ</span>
           </button>
         </nav>
 
-        <section class="streak-box" aria-label="連続学習">
-          <span class="label">STREAK</span>
-          <strong>14日</strong>
-          <p>今日のミッションを1つ終えると、炎バッジが進化します。</p>
+        <section class="sidebar-status" aria-label="学習リズム">
+          <span class="eyebrow">Rhythm</span>
+          <strong>継続 18日</strong>
+          <p>休息日を1回だけ保留中。途切れにくい設計で、学習再開を守ります。</p>
         </section>
       </aside>
 
       <div class="workspace">
         <header class="topbar">
           <div>
-            <span class="label">Exam Adventure</span>
-            <h1 id="page-title">今日の合格クエスト</h1>
+            <span class="eyebrow">Learning Gamification Studio</span>
+            <h1 id="page-title">今日の学習ループ</h1>
           </div>
-          <div class="player">
-            <div class="player-stats">
-              <span>XP 8,420 / 9,000</span>
-              <div class="xp-track" aria-label="レベル18の経験値 83%">
-                <span style="width: 83%"></span>
-              </div>
+          <div class="topbar-actions">
+            <div class="status-pill">
+              <span>本番まで</span>
+              <strong>45日</strong>
             </div>
-            <button class="coin-btn" type="button" aria-label="所持コイン">
-              <span aria-hidden="true">◎</span>
-              1,280
-            </button>
+            <div class="status-pill">
+              <span>今日の枠</span>
+              <strong>28分</strong>
+            </div>
+            <button class="icon-button" id="open-challenge" aria-label="クイック診断">?</button>
           </div>
         </header>
 
@@ -85,10 +84,10 @@
       </div>
     </div>
 
-    <dialog id="challenge-dialog" class="challenge-dialog">
-      <form method="dialog" class="challenge-panel">
+    <dialog id="practice-dialog" class="practice-dialog">
+      <form method="dialog" class="practice-panel">
         <button class="icon-button close-button" value="cancel" aria-label="閉じる">×</button>
-        <div id="challenge-content"></div>
+        <div id="practice-content"></div>
       </form>
     </dialog>
 
