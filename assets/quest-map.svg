@@ -1,0 +1,31 @@
+<svg width="720" height="486" viewBox="0 0 720 486" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">G検定クエストマップ</title>
+  <desc id="desc">G検定の学習ステージをゲームのマップのように表した図</desc>
+  <rect width="720" height="486" rx="22" fill="#FBFDFB"/>
+  <rect x="56" y="56" width="608" height="374" rx="18" fill="white" stroke="#DDE7E4" stroke-width="2"/>
+  <path d="M111 310C180 220 241 268 303 194C366 119 431 150 481 236C517 298 567 271 610 174" stroke="#DDE7E4" stroke-width="18" stroke-linecap="round"/>
+  <path d="M111 310C180 220 241 268 303 194C366 119 431 150 481 236" stroke="#0C8278" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="111" cy="310" r="34" fill="#8CC84B"/>
+  <path d="M99 310L108 319L124 300" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="222" cy="247" r="34" fill="#8CC84B"/>
+  <path d="M210 247L219 256L235 237" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="303" cy="194" r="38" fill="#E85D3F"/>
+  <path d="M303 171L310 187L327 189L314 200L318 217L303 208L288 217L292 200L279 189L296 187L303 171Z" fill="white"/>
+  <circle cx="409" cy="175" r="34" fill="#F0A33A"/>
+  <rect x="392" y="163" width="34" height="24" rx="6" fill="white"/>
+  <path d="M398 175H420" stroke="#F0A33A" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="481" cy="236" r="34" fill="#3E74B8"/>
+  <path d="M481 215L496 226V247L481 258L466 247V226L481 215Z" fill="white"/>
+  <circle cx="610" cy="174" r="40" fill="#7660B5"/>
+  <path d="M610 149L617 166L636 168L622 181L626 200L610 190L594 200L598 181L584 168L603 166L610 149Z" fill="#FFF6D7"/>
+  <rect x="92" y="82" width="172" height="82" rx="14" fill="#FFF4DE"/>
+  <rect x="112" y="105" width="70" height="10" rx="5" fill="#F0A33A"/>
+  <rect x="112" y="127" width="116" height="8" rx="4" fill="#CFA963"/>
+  <rect x="112" y="144" width="92" height="8" rx="4" fill="#CFA963"/>
+  <rect x="456" y="330" width="148" height="58" rx="14" fill="#F3EDFF"/>
+  <rect x="476" y="352" width="88" height="10" rx="5" fill="#7660B5"/>
+  <rect x="86" y="368" width="240" height="10" rx="5" fill="#E8EEF0"/>
+  <rect x="86" y="368" width="176" height="10" rx="5" fill="#E85D3F"/>
+  <circle cx="336" cy="373" r="18" fill="#F0A33A"/>
+  <path d="M336 361L339 369L348 370L341 376L343 385L336 380L329 385L331 376L324 370L333 369L336 361Z" fill="white"/>
+</svg>

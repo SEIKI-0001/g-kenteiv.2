@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>G検定クエスト | ゲーミフィケーション版</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23e85d3f'/%3E%3Cpath d='M32 10l6.5 13.3 14.7 2.1-10.6 10.3 2.5 14.6L32 43.4 18.9 50.3l2.5-14.6L10.8 25.4l14.7-2.1L32 10z' fill='white'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-nav" aria-label="メインナビゲーション">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">★</div>
+          <div>
+            <p>G検定クエスト</p>
+            <span>Rank B / Lv. 18</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-link is-active" data-view="home">
+            <span aria-hidden="true">⌂</span>
+            <span>ホーム</span>
+          </button>
+          <button class="nav-link" data-view="quests">
+            <span aria-hidden="true">⚑</span>
+            <span>クエスト</span>
+          </button>
+          <button class="nav-link" data-view="dungeon">
+            <span aria-hidden="true">◇</span>
+            <span>弱点ダンジョン</span>
+          </button>
+          <button class="nav-link" data-view="boss">
+            <span aria-hidden="true">◆</span>
+            <span>ボス模試</span>
+          </button>
+          <button class="nav-link" data-view="cards">
+            <span aria-hidden="true">▣</span>
+            <span>カード図鑑</span>
+          </button>
+          <button class="nav-link" data-view="guild">
+            <span aria-hidden="true">♢</span>
+            <span>ギルド</span>
+          </button>
+        </nav>
+
+        <section class="streak-box" aria-label="連続学習">
+          <span class="label">STREAK</span>
+          <strong>14日</strong>
+          <p>今日のミッションを1つ終えると、炎バッジが進化します。</p>
+        </section>
+      </aside>
+
+      <div class="workspace">
+        <header class="topbar">
+          <div>
+            <span class="label">Exam Adventure</span>
+            <h1 id="page-title">今日の合格クエスト</h1>
+          </div>
+          <div class="player">
+            <div class="player-stats">
+              <span>XP 8,420 / 9,000</span>
+              <div class="xp-track" aria-label="レベル18の経験値 83%">
+                <span style="width: 83%"></span>
+              </div>
+            </div>
+            <button class="coin-btn" type="button" aria-label="所持コイン">
+              <span aria-hidden="true">◎</span>
+              1,280
+            </button>
+          </div>
+        </header>
+
+        <main id="app" class="content-grid" aria-live="polite"></main>
+      </div>
+    </div>
+
+    <dialog id="challenge-dialog" class="challenge-dialog">
+      <form method="dialog" class="challenge-panel">
+        <button class="icon-button close-button" value="cancel" aria-label="閉じる">×</button>
+        <div id="challenge-content"></div>
+      </form>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

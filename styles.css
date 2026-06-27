@@ -1,0 +1,814 @@
+:root {
+  color-scheme: light;
+  --ink: #17202a;
+  --muted: #687583;
+  --line: #dde4ea;
+  --paper: #f6f8f5;
+  --panel: #ffffff;
+  --charcoal: #162624;
+  --teal: #0c8278;
+  --green: #8cc84b;
+  --orange: #f0a33a;
+  --coral: #e85d3f;
+  --blue: #3e74b8;
+  --violet: #7660b5;
+  --shadow: 0 18px 44px rgba(31, 47, 55, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(12, 130, 120, 0.08), rgba(246, 248, 245, 0) 360px),
+    var(--paper);
+  color: var(--ink);
+  font-family: "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.side-nav {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  gap: 22px;
+  padding: 22px 16px;
+  background: var(--charcoal);
+  color: #f4fbf7;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--coral);
+  color: #fff7e8;
+  font-size: 22px;
+}
+
+.brand p,
+.brand span,
+.streak-box p {
+  margin: 0;
+}
+
+.brand p {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.brand span {
+  color: #b7cbc6;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.nav-list {
+  display: grid;
+  gap: 6px;
+}
+
+.nav-link {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: transparent;
+  color: #dce9e5;
+  text-align: left;
+}
+
+.nav-link span:first-child {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: #f6c45d;
+  font-weight: 800;
+}
+
+.nav-link:hover,
+.nav-link.is-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.streak-box {
+  margin-top: auto;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.streak-box strong {
+  display: block;
+  margin: 6px 0 8px;
+  color: #ffd66a;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.streak-box p {
+  color: #c5d5d1;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.workspace {
+  min-width: 0;
+  padding: 28px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.label {
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.topbar h1 {
+  margin: 4px 0 0;
+  font-size: clamp(24px, 2.4vw, 36px);
+  line-height: 1.18;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min(420px, 100%);
+}
+
+.player-stats {
+  flex: 1 1 auto;
+  min-width: 180px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: var(--panel);
+}
+
+.player-stats span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.xp-track,
+.progress-track {
+  overflow: hidden;
+  height: 9px;
+  border-radius: 999px;
+  background: #e4ebef;
+}
+
+.xp-track {
+  margin-top: 7px;
+}
+
+.xp-track span,
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.xp-track span {
+  background: linear-gradient(90deg, var(--green), var(--orange), var(--coral));
+}
+
+.coin-btn,
+.primary-button,
+.secondary-button,
+.icon-button,
+.quest-action,
+.tab-button {
+  min-height: 38px;
+  border-radius: 8px;
+}
+
+.coin-btn,
+.secondary-button,
+.icon-button,
+.quest-action {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.coin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  font-weight: 800;
+}
+
+.coin-btn span {
+  color: var(--orange);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.stack {
+  display: grid;
+  gap: 18px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.panel-pad {
+  padding: 18px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 0.72fr);
+  gap: 18px;
+  padding: 22px;
+}
+
+.hero h2,
+.section-title h2,
+.view-header h2,
+.metric strong,
+.rank-card strong {
+  margin: 0;
+}
+
+.hero h2 {
+  font-size: clamp(26px, 3vw, 44px);
+  line-height: 1.12;
+}
+
+.hero p {
+  max-width: 760px;
+  margin: 12px 0 18px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.hero-map {
+  min-height: 234px;
+  display: grid;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+
+.hero-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.inline-actions,
+.section-title,
+.card-top,
+.reward-row,
+.badge-row,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title {
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-title h2 {
+  font-size: 20px;
+}
+
+.section-title p,
+.view-header p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.primary-button,
+.secondary-button,
+.quest-action,
+.tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  font-weight: 800;
+}
+
+.primary-button {
+  border: 1px solid transparent;
+  background: var(--coral);
+  color: #ffffff;
+}
+
+.primary-button:hover {
+  background: #cf4d32;
+}
+
+.secondary-button:hover,
+.quest-action:hover {
+  border-color: #b7c6cc;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  min-height: 112px;
+  padding: 16px;
+}
+
+.metric span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.metric em {
+  display: inline-block;
+  margin-top: 11px;
+  color: var(--teal);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.quest-list,
+.dungeon-list,
+.achievement-list,
+.card-grid,
+.boss-grid,
+.guild-list {
+  display: grid;
+  gap: 10px;
+}
+
+.quest-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 76px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.quest-card.is-complete {
+  background: #f2faef;
+}
+
+.quest-icon,
+.level-node,
+.badge-icon,
+.card-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.quest-icon {
+  width: 40px;
+  height: 40px;
+  background: #fff1dd;
+  color: var(--orange);
+  font-size: 20px;
+}
+
+.quest-card.is-complete .quest-icon {
+  background: #e7f5dc;
+  color: #4e8e30;
+}
+
+.quest-card h3,
+.dungeon-card h3,
+.achievement-item h3,
+.boss-card h3,
+.guild-item h3,
+.card-item h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.quest-card p,
+.dungeon-card p,
+.achievement-item p,
+.boss-card p,
+.guild-item p,
+.card-item p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.reward-pill {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  border: 1px solid #efd9a7;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: #fff8e7;
+  color: #9a6a1d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.level-path {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.level-node {
+  min-height: 92px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--muted);
+}
+
+.level-node.is-current {
+  border-color: rgba(232, 93, 63, 0.4);
+  background: #fff2ee;
+  color: var(--coral);
+}
+
+.level-node.is-clear {
+  background: #eef8e9;
+  color: #4e8e30;
+}
+
+.dungeon-card,
+.achievement-item,
+.boss-card,
+.guild-item,
+.card-item,
+.rank-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.dungeon-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.dungeon-row {
+  display: grid;
+  grid-template-columns: 94px minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.progress-track span {
+  background: var(--teal);
+}
+
+.achievement-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+
+.badge-icon,
+.card-icon {
+  width: 38px;
+  height: 38px;
+}
+
+.badge-icon {
+  background: #eef4ff;
+  color: var(--blue);
+}
+
+.boss-grid,
+.card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.boss-card,
+.card-item,
+.guild-item {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.boss-score {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.boss-score strong {
+  font-size: 38px;
+  line-height: 1;
+}
+
+.danger {
+  color: var(--coral);
+}
+
+.card-icon {
+  background: #f3edff;
+  color: var(--violet);
+}
+
+.tab-list {
+  display: inline-flex;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px;
+  background: #ffffff;
+}
+
+.tab-button {
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.tab-button.is-active {
+  background: var(--teal);
+  color: #ffffff;
+}
+
+.view-wide {
+  grid-column: 1 / -1;
+}
+
+.view-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.view-header h2 {
+  font-size: 26px;
+}
+
+.rank-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.rank-card strong {
+  font-size: 42px;
+  color: var(--coral);
+}
+
+.challenge-dialog {
+  width: min(680px, calc(100vw - 28px));
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+}
+
+.challenge-dialog::backdrop {
+  background: rgba(22, 38, 36, 0.6);
+}
+
+.challenge-panel {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 38px;
+  place-items: center;
+}
+
+.challenge-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.challenge-option {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.challenge-option.is-correct {
+  border-color: #9bcf75;
+  background: #f2faed;
+}
+
+.challenge-option.is-wrong {
+  border-color: #ef9d89;
+  background: #fff1ed;
+}
+
+.answer-key {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 8px;
+  background: #eef3f4;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.loot-box {
+  margin-top: 14px;
+  border-left: 4px solid var(--orange);
+  padding: 12px;
+  background: #fff8e9;
+  line-height: 1.7;
+}
+
+@media (max-width: 1120px) {
+  .app-shell {
+    grid-template-columns: 86px minmax(0, 1fr);
+  }
+
+  .side-nav {
+    padding: 18px 12px;
+  }
+
+  .brand div:last-child,
+  .nav-link span:last-child,
+  .streak-box {
+    display: none;
+  }
+
+  .nav-link {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .content-grid,
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-grid,
+  .boss-grid,
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    display: block;
+  }
+
+  .side-nav {
+    position: static;
+    height: auto;
+    padding: 14px;
+  }
+
+  .brand div:last-child,
+  .nav-link span:last-child {
+    display: block;
+  }
+
+  .nav-list {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .nav-link {
+    grid-template-columns: 24px max-content;
+    min-width: max-content;
+  }
+
+  .workspace {
+    padding: 18px 14px 28px;
+  }
+
+  .topbar,
+  .view-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .player {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .player-stats {
+    flex-basis: 100%;
+  }
+
+  .metric-grid,
+  .level-path,
+  .boss-grid,
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-card,
+  .dungeon-row {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-icon,
+  .quest-action {
+    width: 100%;
+  }
+}
