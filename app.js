@@ -1,4 +1,15 @@
 const STORAGE_KEY = "g-kentei-support-state-v1";
+const appConfig = window.__APP_CONFIG__ || {};
+const supabaseClient = createSupabaseClient(appConfig);
+const syncState = {
+  user: null,
+  hydrating: false,
+  syncing: false,
+  pending: false,
+  timer: null,
+  message: supabaseClient ? "ログインで同期" : "ローカル保存",
+  lastSyncedAt: null,
+};
 const state = loadUserState();
 
 const content = window.gKenteiContent;
@@ -26,6 +37,36 @@ const app = document.querySelector("#app");
 const pageTitle = document.querySelector("#page-title");
 const dialog = document.querySelector("#practice-dialog");
 const practiceContent = document.querySelector("#practice-content");
+const authPanel = document.querySelector("#auth-panel");
+const authForm = document.querySelector("#auth-form");
+const authEmail = document.querySelector("#auth-email");
+const authPassword = document.querySelector("#auth-password");
+const authLabel = document.querySelector("#auth-label");
+const syncStatus = document.querySelector("#sync-status");
+const authSignOut = document.querySelector("#auth-signout");
+
+const CONFIDENCE_TO_DB = {
+  低: "low",
+  中: "medium",
+  高: "high",
+};
+
+const REVIEW_OUTCOME_BY_LABEL = {
+  覚えていた: "remembered",
+  曖昧: "vague",
+  忘れた: "forgot",
+};
+
+function createSupabaseClient(config) {
+  const url = config.supabaseUrl || config.SUPABASE_URL;
+  const anonKey = config.supabaseAnonKey || config.SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey || !window.supabase?.createClient) {
+    return null;
+  }
+
+  return window.supabase.createClient(url, anonKey);
+}
 
 function createInitialState() {
   return {
@@ -50,6 +91,7 @@ function loadUserState() {
     const savedState = JSON.parse(rawState);
     return {
       ...initialState,
+      activeView: savedState.activeView || initialState.activeView,
       activeMode: savedState.activeMode || initialState.activeMode,
       focusDomain: savedState.focusDomain || initialState.focusDomain,
       activeSession: savedState.activeSession || null,
@@ -62,9 +104,12 @@ function loadUserState() {
   }
 }
 
-function saveUserState() {
+function saveUserState(options = {}) {
+  const { sync = true } = options;
+
   try {
     const savedState = {
+      activeView: state.activeView,
       activeMode: state.activeMode,
       focusDomain: state.focusDomain,
       activeSession: state.activeSession,
@@ -76,6 +121,10 @@ function saveUserState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedState));
   } catch {
     // 保存できない環境でも、画面操作自体は続けられるようにする。
+  }
+
+  if (sync) {
+    queueCloudSync();
   }
 }
 
@@ -96,6 +145,7 @@ function resetUserState() {
     // 保存先が使えない場合も、画面上の状態は初期化する。
   }
 
+  resetCloudProgress();
   render();
 }
 
@@ -132,6 +182,7 @@ function normalizeUserState() {
   const reviewIds = new Set(reviewQueue.map((review) => review.id));
   const domainNames = new Set(domains.map((domain) => domain.name));
   const allowedModes = new Set(["all", "recall", "practice", "explain", "review"]);
+  const allowedViews = new Set(["dashboard", "missions", "review", "mastery", "rewards", "coach"]);
 
   state.completedMissions = new Set([...state.completedMissions].filter((id) => missionIds.has(id)));
   state.reviewResults = Object.fromEntries(Object.entries(state.reviewResults).filter(([id]) => reviewIds.has(id)));
@@ -146,6 +197,10 @@ function normalizeUserState() {
 
   if (!allowedModes.has(state.activeMode)) {
     state.activeMode = "all";
+  }
+
+  if (!allowedViews.has(state.activeView)) {
+    state.activeView = "dashboard";
   }
 }
 
@@ -175,6 +230,393 @@ function readinessScore() {
 
 function dueTodayCount() {
   return reviewQueue.filter((review) => review.due === "今日").length;
+}
+
+function updateAuthUI(message = syncState.message) {
+  if (!authPanel) return;
+
+  const isConfigured = Boolean(supabaseClient);
+  syncState.message = message;
+  authPanel.classList.toggle("is-disabled", !isConfigured);
+  authForm.hidden = !isConfigured || Boolean(syncState.user);
+  authSignOut.hidden = !isConfigured || !syncState.user;
+
+  if (!isConfigured) {
+    syncStatus.textContent = "ローカル保存";
+    authLabel.textContent = "Supabase未設定";
+    return;
+  }
+
+  if (syncState.user) {
+    syncStatus.textContent = message;
+    authLabel.textContent = syncState.user.email || "ログイン中";
+    return;
+  }
+
+  syncStatus.textContent = message;
+  authLabel.textContent = "進捗を同期";
+}
+
+async function initSupabaseSync() {
+  updateAuthUI();
+
+  if (!supabaseClient) return;
+
+  try {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+
+    syncState.user = data.session?.user || null;
+    updateAuthUI(syncState.user ? "同期中" : "ログインで同期");
+
+    if (syncState.user) {
+      await loadCloudProgress();
+    }
+
+    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+      const nextUser = session?.user || null;
+      const changedUser = nextUser?.id !== syncState.user?.id;
+      syncState.user = nextUser;
+
+      if (!nextUser) {
+        updateAuthUI("ローカル保存");
+        return;
+      }
+
+      updateAuthUI(changedUser ? "同期中" : "同期済み");
+      if (changedUser) {
+        await loadCloudProgress();
+      }
+    });
+  } catch (error) {
+    console.error("Supabase session error", error);
+    updateAuthUI("同期を確認できません");
+  }
+}
+
+async function handleAuthSubmit(event) {
+  event.preventDefault();
+
+  if (!supabaseClient) return;
+
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+
+  if (!email || password.length < 6) {
+    updateAuthUI("メールと6文字以上のパスワードを入力");
+    return;
+  }
+
+  updateAuthUI("ログイン中");
+
+  try {
+    const signIn = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (signIn.error) {
+      const signUp = await supabaseClient.auth.signUp({ email, password });
+      if (signUp.error) throw signUp.error;
+
+      syncState.user = signUp.data.session?.user || null;
+      authPassword.value = "";
+
+      if (syncState.user) {
+        await loadCloudProgress();
+      } else {
+        updateAuthUI("確認メールを開いてください");
+      }
+      return;
+    }
+
+    syncState.user = signIn.data.user;
+    authPassword.value = "";
+    await loadCloudProgress();
+  } catch (error) {
+    console.error("Supabase auth error", error);
+    updateAuthUI("ログインできませんでした");
+  }
+}
+
+async function signOut() {
+  if (!supabaseClient) return;
+
+  await supabaseClient.auth.signOut();
+  syncState.user = null;
+  updateAuthUI("ローカル保存");
+}
+
+async function loadCloudProgress() {
+  if (!supabaseClient || !syncState.user) return;
+
+  syncState.hydrating = true;
+  updateAuthUI("同期中");
+
+  try {
+    const userId = syncState.user.id;
+    await ensureUserRows(userId);
+
+    const [stateResponse, missionResponse, reviewResponse] = await Promise.all([
+      supabaseClient.from("user_learning_state").select("*").eq("user_id", userId).maybeSingle(),
+      supabaseClient.from("mission_progress").select("*").eq("user_id", userId),
+      supabaseClient.from("review_card_progress").select("*").eq("user_id", userId),
+    ]);
+
+    const error = stateResponse.error || missionResponse.error || reviewResponse.error;
+    if (error) throw error;
+
+    const cloudState = stateResponse.data;
+    const missionRows = missionResponse.data || [];
+    const reviewRows = reviewResponse.data || [];
+
+    if (hasMeaningfulCloudProgress(cloudState, missionRows, reviewRows)) {
+      applyCloudProgress(cloudState, missionRows, reviewRows);
+      saveUserState({ sync: false });
+      render();
+    }
+
+    await syncUserStateToCloud({ silent: true });
+    updateAuthUI("同期済み");
+  } catch (error) {
+    console.error("Supabase load error", error);
+    updateAuthUI("同期に失敗しました");
+  } finally {
+    syncState.hydrating = false;
+  }
+}
+
+async function ensureUserRows(userId) {
+  const profileResponse = await supabaseClient.from("profiles").upsert({ id: userId }, { onConflict: "id" });
+  if (profileResponse.error) throw profileResponse.error;
+
+  const stateResponse = await supabaseClient
+    .from("user_learning_state")
+    .upsert({ user_id: userId }, { onConflict: "user_id" });
+  if (stateResponse.error) throw stateResponse.error;
+}
+
+function hasMeaningfulCloudProgress(cloudState, missionRows, reviewRows) {
+  const hasState =
+    cloudState &&
+    (cloudState.active_mode !== "all" ||
+      cloudState.focus_domain !== "法律・倫理" ||
+      cloudState.active_mission_id ||
+      Object.keys(cloudState.practice_cursor || {}).length > 0);
+  const hasMissionProgress = missionRows.some((row) => row.status === "completed" || row.status === "in_progress");
+  const hasReviewProgress = reviewRows.some((row) => row.outcome);
+
+  return Boolean(hasState || hasMissionProgress || hasReviewProgress);
+}
+
+function applyCloudProgress(cloudState, missionRows, reviewRows) {
+  if (cloudState) {
+    state.activeView = cloudState.active_view || state.activeView;
+    state.activeMode = cloudState.active_mode || state.activeMode;
+    state.focusDomain = cloudState.focus_domain || state.focusDomain;
+    state.activeSession = cloudState.active_mission_id || null;
+    state.practiceCursor = cloudState.practice_cursor || {};
+  }
+
+  if (missionRows.length) {
+    state.completedMissions = new Set(
+      missionRows.filter((row) => row.status === "completed").map((row) => row.mission_id),
+    );
+  }
+
+  if (reviewRows.length) {
+    state.reviewResults = reviewRows.reduce((results, row) => {
+      const outcome = row.outcome;
+      if (reviewOutcomes[outcome]) {
+        results[row.review_card_id] = { ...reviewOutcomes[outcome], outcome };
+      }
+      return results;
+    }, {});
+  }
+
+  normalizeUserState();
+}
+
+function queueCloudSync() {
+  if (!supabaseClient || !syncState.user || syncState.hydrating) return;
+
+  syncState.pending = true;
+  updateAuthUI("同期待ち");
+  window.clearTimeout(syncState.timer);
+  syncState.timer = window.setTimeout(() => {
+    syncUserStateToCloud();
+  }, 650);
+}
+
+async function syncUserStateToCloud(options = {}) {
+  const { silent = false } = options;
+
+  if (!supabaseClient || !syncState.user) return;
+
+  if (syncState.syncing) {
+    syncState.pending = true;
+    return;
+  }
+
+  syncState.syncing = true;
+  syncState.pending = false;
+
+  if (!silent) {
+    updateAuthUI("同期中");
+  }
+
+  try {
+    const userId = syncState.user.id;
+    const now = new Date().toISOString();
+    const missionRows = missions.map((mission) => {
+      const done = state.completedMissions.has(mission.id);
+      return {
+        user_id: userId,
+        mission_id: mission.id,
+        domain: mission.domain,
+        mission_type: mission.type,
+        status: done ? "completed" : "not_started",
+        started_at: done ? now : null,
+        completed_at: done ? now : null,
+        total_minutes: done ? mission.minutes : 0,
+      };
+    });
+    const reviewRows = Object.entries(state.reviewResults)
+      .map(([reviewId, result]) => {
+        const review = reviewQueue.find((item) => item.id === reviewId);
+        const outcome = getReviewOutcome(result);
+        if (!review || !outcome) return null;
+
+        return {
+          user_id: userId,
+          review_card_id: reviewId,
+          domain: review.domain,
+          outcome,
+          confidence: CONFIDENCE_TO_DB[result.confidence] || null,
+          next_due_on: nextDueDate(result.nextDue),
+          answered_at: now,
+          prompt_snapshot: review.prompt,
+        };
+      })
+      .filter(Boolean);
+
+    const stateResponse = await supabaseClient.from("user_learning_state").upsert(
+      {
+        user_id: userId,
+        active_view: state.activeView,
+        active_mode: state.activeMode,
+        focus_domain: state.focusDomain,
+        active_mission_id: state.activeSession,
+        practice_cursor: state.practiceCursor,
+        last_opened_at: now,
+      },
+      { onConflict: "user_id" },
+    );
+    if (stateResponse.error) throw stateResponse.error;
+
+    const missionResponse = await supabaseClient
+      .from("mission_progress")
+      .upsert(missionRows, { onConflict: "user_id,mission_id" });
+    if (missionResponse.error) throw missionResponse.error;
+
+    if (reviewRows.length) {
+      const reviewResponse = await supabaseClient
+        .from("review_card_progress")
+        .upsert(reviewRows, { onConflict: "user_id,review_card_id" });
+      if (reviewResponse.error) throw reviewResponse.error;
+    }
+
+    syncState.lastSyncedAt = new Date();
+    updateAuthUI("同期済み");
+  } catch (error) {
+    console.error("Supabase sync error", error);
+    updateAuthUI("同期に失敗しました");
+  } finally {
+    const needsAnotherSync = syncState.pending;
+    syncState.syncing = false;
+
+    if (needsAnotherSync) {
+      queueCloudSync();
+    }
+  }
+}
+
+async function resetCloudProgress() {
+  if (!supabaseClient || !syncState.user) return;
+
+  updateAuthUI("リセット中");
+
+  try {
+    const userId = syncState.user.id;
+    const responses = await Promise.all([
+      supabaseClient.from("mission_progress").delete().eq("user_id", userId),
+      supabaseClient.from("review_card_progress").delete().eq("user_id", userId),
+      supabaseClient.from("challenge_attempts").delete().eq("user_id", userId),
+      supabaseClient.from("domain_progress").delete().eq("user_id", userId),
+      supabaseClient.from("study_sessions").delete().eq("user_id", userId),
+      supabaseClient.from("daily_study_stats").delete().eq("user_id", userId),
+      supabaseClient.from("user_learning_state").upsert(
+        {
+          user_id: userId,
+          active_view: "dashboard",
+          active_mode: "all",
+          focus_domain: "法律・倫理",
+          active_mission_id: null,
+          practice_cursor: {},
+          last_opened_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" },
+      ),
+    ]);
+    const error = responses.find((response) => response.error)?.error;
+    if (error) throw error;
+
+    updateAuthUI("リセット済み");
+  } catch (error) {
+    console.error("Supabase reset error", error);
+    updateAuthUI("リセットに失敗しました");
+  }
+}
+
+function getReviewOutcome(result) {
+  return result?.outcome || REVIEW_OUTCOME_BY_LABEL[result?.label] || null;
+}
+
+function nextDueDate(label) {
+  const offsets = {
+    今日: 0,
+    "今日もう一度": 0,
+    明日: 1,
+    "3日後": 3,
+    "7日後": 7,
+  };
+  const days = offsets[label] ?? 1;
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function getChallengeId(challenge) {
+  const index = challenges.indexOf(challenge);
+  return challenge.id || `challenge-${index + 1}`;
+}
+
+async function recordChallengeAttempt(challenge, selectedAnswer) {
+  if (!supabaseClient || !syncState.user) return;
+
+  try {
+    const response = await supabaseClient.from("challenge_attempts").insert({
+      user_id: syncState.user.id,
+      challenge_id: getChallengeId(challenge),
+      domain: challenge.domain,
+      question_snapshot: challenge.question,
+      selected_answer_index: selectedAnswer,
+      correct_answer_index: challenge.answer,
+      feedback_snapshot: challenge.feedback,
+    });
+
+    if (response.error) throw response.error;
+  } catch (error) {
+    console.error("Supabase challenge attempt error", error);
+    updateAuthUI("回答保存に失敗しました");
+  }
 }
 
 function getChallenge(domain, fallbackIndex = 0) {
@@ -212,6 +654,7 @@ function render() {
   };
   app.innerHTML = views[state.activeView]();
   bindEvents();
+  updateAuthUI();
 }
 
 function renderDashboard() {
@@ -701,7 +1144,7 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const id = button.dataset.reviewId;
       const outcome = button.dataset.reviewOutcome;
-      state.reviewResults[id] = reviewOutcomes[outcome];
+      state.reviewResults[id] = { ...reviewOutcomes[outcome], outcome };
       saveUserState();
       render();
     });
@@ -743,6 +1186,7 @@ function openPractice(domain, fallbackIndex = 0) {
         option.classList.toggle("is-correct", optionAnswer === challenge.answer);
         option.classList.toggle("is-wrong", optionAnswer === answer && answer !== challenge.answer);
       });
+      recordChallengeAttempt(challenge, answer);
       document.querySelector("#feedback-slot").innerHTML = `<div class="feedback">${challenge.feedback}</div>`;
     });
   });
@@ -763,5 +1207,8 @@ document.querySelector("#reset-progress").addEventListener("click", () => {
     resetUserState();
   }
 });
+authForm.addEventListener("submit", handleAuthSubmit);
+authSignOut.addEventListener("click", signOut);
 
 render();
+initSupabaseSync();

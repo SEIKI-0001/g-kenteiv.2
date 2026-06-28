@@ -204,6 +204,71 @@ button {
   font-size: 16px;
 }
 
+.auth-panel {
+  display: grid;
+  grid-template-columns: minmax(136px, auto) minmax(280px, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 54px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  background: #ffffff;
+}
+
+.auth-panel.is-disabled {
+  grid-template-columns: minmax(136px, auto);
+}
+
+.auth-copy {
+  min-width: 0;
+}
+
+.auth-copy span,
+.auth-copy strong {
+  display: block;
+}
+
+.auth-copy span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.auth-copy strong {
+  overflow: hidden;
+  margin-top: 2px;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-form {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(110px, 0.8fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.auth-form[hidden],
+#auth-signout[hidden] {
+  display: none;
+}
+
+.auth-form input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #fbfdfc;
+  color: var(--ink);
+}
+
+.auth-form input:focus {
+  border-color: var(--teal);
+  outline: 3px solid rgba(11, 116, 107, 0.13);
+}
+
 .icon-button,
 .primary-button,
 .secondary-button,
@@ -1086,7 +1151,9 @@ button {
   .loop-panel,
   .hero-panel,
   .session-layout,
-  .coach-layout {
+  .coach-layout,
+  .auth-panel,
+  .auth-form {
     grid-template-columns: 1fr;
   }
 
@@ -1142,6 +1209,15 @@ button {
 
   .topbar-actions {
     width: 100%;
+  }
+
+  .auth-panel {
+    width: 100%;
+  }
+
+  .auth-form {
+    width: 100%;
+    grid-template-columns: 1fr;
   }
 
   .status-pill {
