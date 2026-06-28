@@ -60,13 +60,12 @@ SUPABASE_ANON_KEY=
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` はブラウザに出さないため、このアプリでは設定しません。
-Vercelのビルド時に `npm run build` が `env.js` を生成し、画面側からSupabaseへ接続します。
+Vercelのビルド時に `npm run build` が `public/env.js` を生成し、画面側からSupabaseへ接続します。
 
 ## ローカル確認
 
 ```bash
-npm run build
-python3 -m http.server 4174
+npm run dev
 ```
 
 ブラウザで `http://127.0.0.1:4174/` を開いて確認できます。
