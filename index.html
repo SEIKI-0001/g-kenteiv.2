@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>G検定マスタリーラボ | Gamified Learning Service</title>
+    <title>G検定 合格ナビ</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b746b'/%3E%3Cpath d='M18 35l9 9 19-24' stroke='white' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
@@ -20,52 +20,52 @@
     <div class="app-shell">
       <aside class="sidebar" aria-label="メインナビゲーション">
         <div class="brand">
-          <div class="brand-mark" aria-hidden="true">M</div>
+          <div class="brand-mark" aria-hidden="true">G</div>
           <div>
-            <p>G検定マスタリーラボ</p>
-            <span>学習ゲーミフィケーション版</span>
+            <p>G検定 合格ナビ</p>
+            <span>今日やることだけに集中</span>
           </div>
         </div>
 
         <nav class="nav-list">
           <button class="nav-item is-active" data-view="dashboard">
             <span aria-hidden="true">⌂</span>
-            <span>ダッシュボード</span>
+            <span>ホーム</span>
           </button>
           <button class="nav-item" data-view="missions">
             <span aria-hidden="true">✓</span>
-            <span>ミッション</span>
+            <span>今日の学習</span>
           </button>
           <button class="nav-item" data-view="review">
             <span aria-hidden="true">↻</span>
-            <span>復習キュー</span>
+            <span>復習</span>
           </button>
           <button class="nav-item" data-view="mastery">
             <span aria-hidden="true">▦</span>
-            <span>マスタリー</span>
+            <span>弱点</span>
           </button>
           <button class="nav-item" data-view="rewards">
             <span aria-hidden="true">◇</span>
-            <span>リワード</span>
+            <span>バッジ</span>
           </button>
           <button class="nav-item" data-view="coach">
             <span aria-hidden="true">✦</span>
-            <span>コーチ</span>
+            <span>学習計画</span>
           </button>
         </nav>
 
         <section class="sidebar-status" aria-label="学習リズム">
-          <span class="eyebrow">Rhythm</span>
+          <span class="eyebrow">学習リズム</span>
           <strong>継続 18日</strong>
-          <p>休息日を1回だけ保留中。途切れにくい設計で、学習再開を守ります。</p>
+          <p>昨日休んでも大丈夫。今日は8分だけ戻れば、ペースを保てます。</p>
         </section>
       </aside>
 
       <div class="workspace">
         <header class="topbar">
           <div>
-            <span class="eyebrow">Learning Gamification Studio</span>
-            <h1 id="page-title">今日の学習ループ</h1>
+            <span class="eyebrow">G検定まで45日</span>
+            <h1 id="page-title">ホーム</h1>
           </div>
           <div class="topbar-actions">
             <div class="status-pill">
@@ -76,6 +76,7 @@
               <span>今日の枠</span>
               <strong>28分</strong>
             </div>
+            <button class="secondary-button" id="reset-progress">進捗リセット</button>
             <button class="icon-button" id="open-challenge" aria-label="クイック診断">?</button>
           </div>
         </header>
@@ -91,6 +92,7 @@
       </form>
     </dialog>
 
+    <script src="./data/content.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
